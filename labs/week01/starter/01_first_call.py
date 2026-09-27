@@ -43,7 +43,12 @@ def main() -> int:
         #     temperature=0.0
         #     max_tokens=200
         #   Assign the result to `reply`.
-        reply = None
+        reply = client.chat.completions.create(
+            model=SMALL.name,
+            messages=[{"role": "user", "content": QUESTION}],
+            temperature=0.0,
+            max_tokens=200
+        )
 
         elapsed = time.perf_counter() - started
 
@@ -69,6 +74,9 @@ def main() -> int:
     #      Which part of it would a user actually feel?
     #
     print("\n--- TODO 2: print the four things here ---\n")
+    print(reply.choices[0].message.content)
+    print(reply.choices[0].finish_reason)
+    
 
     # TODO 3. Close the trace.
     #   Call rec.finish(...) with:
