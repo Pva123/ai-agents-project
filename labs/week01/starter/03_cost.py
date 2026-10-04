@@ -75,6 +75,28 @@ def main() -> int:
     #   models. What does this measurement tell you about switching between
     #   them inside one request, and what would you do instead?
 
+    # Cold start measurement
+    subprocess.run(["ollama", "stop", SMALL.name])
+
+    # Cold call (first after stop)
+    reply1, cold_secs = timed(client, SHORT, SMALL.name)
+    print(f"Cold start: {cold_secs:.2f}s")
+
+    # Warm call (immediately after)
+    reply2, warm_secs = timed(client, SHORT, SMALL.name)
+    print(f"Warm call: {warm_secs:.2f}s")
+
+    ratio = cold_secs / max(warm_secs, 0.001)
+    print(f"Cold/warm ratio: {ratio:.1f}x")
+
+    rows.append({
+        "case": "cold_start",
+        "model": SMALL.name,
+        "cold_seconds": round(cold_secs, 3),
+        "warm_seconds": round(warm_secs, 3),
+        "ratio": round(ratio, 2)
+    })
+
     # TODO 8. Estimate what a real evaluation run would cost hosted.
     #
     #   In week 10 you build a golden set and run it. Assume 200 cases, each
@@ -90,6 +112,28 @@ def main() -> int:
     #
     #   Label them as estimates. They are not measurements and the price
     #   list is dated {PRICE_DATE}.
+
+    # Get token counts from long case
+    long_tokens_out = rows[1]["completion_tokens"]
+    long_tokens_in = rows[1]["prompt_tokens"]
+
+    # 200 cases × 14 nights = 2800 total runs
+    total_runs = 200 * 14
+
+    # Estimate for both tiers
+    small_est = estimate(long_tokens_in, long_tokens_out, tier="small")
+    large_est = estimate(long_tokens_in, long_tokens_out, tier="large")
+
+    total_small = (small_est.input_cost + small_est.output_cost) * total_runs
+    total_large = (large_est.input_cost + large_est.output_cost) * total_runs
+
+    per_run_small = small_est.input_cost + small_est.output_cost
+    per_run_large = large_est.input_cost + large_est.output_cost
+    print(f"Per run - Small: €{per_run_small:.4f}, Large: €{per_run_large:.4f}")
+    print(f"Nightly for 14 weeks ({total_runs} runs)")
+    print(f"Small tier: €{total_small:.2f}")
+    print(f"Large tier: €{total_large:.2f}")
+
 
     write_json("artifacts/week01_cost.json",
                {"rows": rows, "price_list_date": PRICE_DATE})

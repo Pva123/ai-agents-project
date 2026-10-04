@@ -4,16 +4,16 @@
 
 Six items. Do not move to block 3 until all six are true.
 
-- [ ] `00_preflight.py` reports every line green, or you know which line is
+- [x] `00_preflight.py` reports every line green, or you know which line is
       red and why. The context window check is the one that matters: a
       failure there means the model is reserving about eleven times the
       memory it needs.
-- [ ] A call returns text, and you printed the text
-- [ ] You printed the finish reason and can say what your program would do
+- [x] A call returns text, and you printed the text
+- [x] You printed the finish reason and can say what your program would do
       differently if it were the truncation reason
-- [ ] You printed both token counts and can say which of the two you control
-- [ ] You printed the elapsed time and can say which part of it a user feels
-- [ ] `python -m project.verify` reports one record in `traces.jsonl` and no
+- [x] You printed both token counts and can say which of the two you control
+- [x] You printed the elapsed time and can say which part of it a user feels
+- [x] `python -m project.verify` reports one record in `traces.jsonl` and no
       contract failures
 
 ## Checkpoint 2, what the numbers showed
@@ -21,17 +21,17 @@ Six items. Do not move to block 3 until all six are true.
 Six items. Be ready to say your numbers out loud, as counts rather than
 percentages.
 
-- [ ] The recording has been run with `--replay --full` and you have the
+- [x] The recording has been run with `--replay --full` and you have the
       eight-cell table in front of you
-- [ ] Your own two cells have been run live, and the two `distinct` columns
+- [x] Your own two cells have been run live, and the two `distinct` columns
       are side by side
-- [ ] You can name the cell that returns a single answer at temperature 1.0
+- [x] You can name the cell that returns a single answer at temperature 1.0
       and explain why that one
-- [ ] You can name which cells a test asserting exact string equality would
+- [x] You can name which cells a test asserting exact string equality would
       pass on, and which it would fail on
-- [ ] Your variance table is saved to `artifacts/week01_variance.json`, not
+- [x] Your variance table is saved to `artifacts/week01_variance.json`, not
       just printed on screen
-- [ ] The sentence from TODO 6 is written in `DECISIONS.md`, and it does not
+- [x] The sentence from TODO 6 is written in `DECISIONS.md`, and it does not
       say "the model is random"
 
 **If your live numbers exactly match the recording on every cell**, that is

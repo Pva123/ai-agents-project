@@ -37,6 +37,15 @@ naming it now is worth more than discovering it in week 9.]
 One sentence on the finish reason: what my program would do differently if
 it came back as a truncation rather than a normal stop.
 
+--- TODO 2: print the four things here ---
+
+To register a change of address, visit your local government website or contact your municipal office to obtain the necessary forms. Complete the form with your new address and submit it in person or by mail, depending on local requirements.
+stop
+24
+45
+2.0512004579941276
+0.04 EUR per thousand calls on the small tier (24 in, 45 out per call), price list of 2026-08-10. Estimate, not a measurement.
+
 [...]
 
 ### 3. Variance
