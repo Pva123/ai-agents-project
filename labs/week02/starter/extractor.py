@@ -54,7 +54,7 @@ class ServiceRequest(BaseModel):
     #          description is sent to the model, so it is prompt engineering
     #          rather than documentation.
 
-    due_date: Optional[str] = Field(
+    due_date: str | None = Field(
         None,
         description="Requested deadline in ISO format (YYYY-MM-DD) or null if no date is mentioned in the message"
     )
@@ -71,7 +71,7 @@ class ServiceRequest(BaseModel):
 # TODO 2. Build the messages.
 # --------------------------------------------------------------------------
 
-SYSTEM_ZERO_SHOT = """\
+"""
 TODO 2a: write the system prompt.
 
 It has to state, in words a model will follow:
@@ -84,6 +84,19 @@ It has to state, in words a model will follow:
 Write the conventions here even though they are also in the schema. The
 schema constrains the shape of the answer. The prompt is what tells the
 model how to decide. Neither one does the other's job.
+"""
+
+SYSTEM_ZERO_SHOT = """\
+You are a help desk message extractor. Extract structured data from customer support messages.
+
+Messages arrive in English, French, or German. Output is always JSON with these fields:
+
+- category: one of access, hardware, billing, facilities, other
+- urgency: one of urgent, standard, info
+- due_date: ISO format YYYY-MM-DD if a date is mentioned, or null if no date appears in the message
+- quote: a phrase copied VERBATIM character-for-character from the source (do not translate or rewrite)
+
+If the message mentions no date, return null for due_date. Do not invent dates.
 """
 
 
@@ -99,7 +112,12 @@ def build_messages(system: str, document_text: str) -> list[dict]:
     instruction and the data are in the same place, a document that contains
     an instruction is indistinguishable from your instruction.
     """
-    raise NotImplementedError("TODO 2b: return the two messages")
+    return [
+        {"role": "system", "content": system},
+        {"role": "user", "content": document_text}
+    ]
+
+
 
 
 # --------------------------------------------------------------------------

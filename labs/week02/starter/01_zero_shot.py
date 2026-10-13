@@ -72,6 +72,39 @@ def main() -> int:
     #
     #   Then run: python -m project.verify
 
+    BEHAVIOR = {
+        "REQ-01": "extracts category access and urgency urgent with a verbatim quote, and no due date because the message only says 'tomorrow at 09:00' and 'today', which are relative expressions, not calendar dates",
+        "REQ-02": "extracts category hardware and urgency standard with a verbatim quote, and due_date 2026-09-15 converted from the European-format 'le 15/09/2026'",
+        "REQ-03": "extracts category billing and urgency standard with a verbatim quote, and no due date because the message states none and says 'Es eilt nicht' (it is not urgent)",
+        "REQ-04": "extracts category facilities and urgency urgent with a verbatim quote, and no due date because 'immediately' is a relative expression, not a calendar date",
+        "REQ-05": "extracts category access and urgency standard with a verbatim quote, and no due date because the message only says 'avant la fin du mois', a relative expression",
+        "REQ-06": "extracts category billing and urgency info with a verbatim quote, and no due date because the message is purely informational ('No action needed from your side') and 'the next billing cycle' is not a calendar date",
+        "REQ-07": "extracts category facilities and urgency standard with a verbatim quote, and due_date 2026-10-01 converted from the written-out German date '1. Oktober 2026'",
+        "REQ-08": "extracts category hardware (a file server outage, not an access problem) and urgency urgent with a verbatim quote, and no due date because the message only says 'ce matin', a relative expression",
+        "REQ-09": "extracts category other and urgency info with a verbatim quote, and no due date because the message is a suggestion with no deadline ('just a suggestion')",
+        "REQ-10": "extracts category access and urgency standard with a verbatim quote, and no due date because the message only says 'before the end of the month', a relative expression",
+    }
+
+    gold_cases = []
+    for doc in DOCS:
+        gold_annotation = GOLD[doc.id]
+
+        gold_cases.append({
+            "case_id": doc.id,
+            "week_added": 2,
+            "question": doc.text,
+            "expected": {
+                "category": gold_annotation.category,
+                "urgency": gold_annotation.urgency,
+                "due_date": gold_annotation.due_date,
+            },
+            "expected_behavior": BEHAVIOR[doc.id] + ".",
+            "slice_tags": [doc.lang],
+        })
+
+    write_json("artifacts/goldset.json", {"cases": gold_cases})
+    print(f"Wrote {len(gold_cases)} cases to artifacts/goldset.json")
+
     return 0
 
 

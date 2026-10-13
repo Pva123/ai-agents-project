@@ -62,7 +62,61 @@ def build_system(variant: str) -> str:
                    needed to attribute it. Week 13 asks who a system works
                    for, and this is what it costs to answer with evidence.
     """
-    raise NotImplementedError("TODO 8: build the variant")
+    # raise NotImplementedError("TODO 8: build the variant")
+    ex1 = (
+    "Input: The badge reader at the side entrance rejects my card since the "
+    "system update. I can still get in through the main door, so it is "
+    "not blocking me.\n"
+    'Output: {"category": "access", "urgency": "standard", "due_date": null, '
+    '"quote": "so it is not blocking me"}\n\n'
+    )
+    ex2 = (
+        "Input: L'ascenseur du batiment administratif est bloque entre le rez et le "
+        "premier avec une personne a l'interieur. Intervention immediate "
+        "necessaire.\n"
+        'Output: {"category": "facilities", "urgency": "urgent", "due_date": null, '
+        '"quote": "Intervention immediate necessaire"}\n\n'
+    )
+    ex3 = (
+        "Input: Der Laptop aus dem Sitzungssaal laedt nicht mehr, das Netzteil ist "
+        "vermutlich defekt. Ersatz waere bis zum 20/09/2026 gut.\n"
+        'Output: {"category": "hardware", "urgency": "standard", '
+        '"due_date": "2026-09-20", "quote": "bis zum 20/09/2026"}\n\n'
+    )
+    ex2_en = (
+        "Input: The lift in the administrative building is stuck between the ground "
+        "floor and the first floor with a person inside. Immediate intervention "
+        "required.\n"
+        'Output: {"category": "facilities", "urgency": "urgent", "due_date": null, '
+        '"quote": "Immediate intervention required"}\n\n'
+    )
+    ex3_en = (
+        "Input: The laptop from the meeting room no longer charges, the power "
+        "adapter is probably faulty. A replacement by 20/09/2026 would be good.\n"
+        'Output: {"category": "hardware", "urgency": "standard", '
+        '"due_date": "2026-09-20", "quote": "by 20/09/2026"}\n\n'
+    )
+
+    if variant == "baseline":
+        examples = [ex1, ex2, ex3]
+    elif variant == "role":
+        examples = [ex1, ex2, ex3]
+    elif variant == "reordered":
+        examples = [ex3, ex2, ex1]
+    elif variant == "no_delimiter":
+        flat = " ".join(e.strip().replace("\n", " ") for e in (ex1, ex2, ex3))
+        return SYSTEM_ZERO_SHOT.strip() + " " + flat
+    elif variant == "english_only":
+        examples = [ex1, ex2_en, ex3_en]
+    else:
+        raise ValueError(f"unknown variant: {variant}")
+
+    block = "Examples:\n\n" + "".join(
+        f"Example {i}:\n{e}" for i, e in enumerate(examples, 1))
+    prompt = SYSTEM_ZERO_SHOT + "\n" + block
+    if variant == "role":
+        prompt = "You are a senior service desk analyst.\n" + prompt
+    return prompt
 
 
 def main() -> int:

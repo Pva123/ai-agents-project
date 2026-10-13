@@ -71,7 +71,37 @@ def score_one(record, gold, document_text: str) -> dict[str, FieldResult]:
 
     Return a dict keyed by field name.
     """
-    raise NotImplementedError("TODO 3: score the four fields")
+    results = {}
+    
+    # Category: exact match
+    results["category"] = FieldResult(
+        correct=record.category == gold.category,
+        got=record.category,
+        expected=gold.category
+    )
+    
+    # Urgency: exact match
+    results["urgency"] = FieldResult(
+        correct=record.urgency == gold.urgency,
+        got=record.urgency,
+        expected=gold.urgency
+    )
+    
+    # Due date: exact match (handles None correctly)
+    results["due_date"] = FieldResult(
+        correct=record.due_date == gold.due_date,
+        got=record.due_date,
+        expected=gold.due_date
+    )
+    
+    # Quote: verbatim substring check in source text
+    results["quote"] = FieldResult(
+        correct=bool(record.quote) and record.quote in document_text,
+        got=record.quote,
+        expected="verbatim in source"
+    )
+    
+    return results
 
 
 # --------------------------------------------------------------------------
@@ -92,7 +122,30 @@ def score_all(records, golds, docs) -> Scoreboard:
     you will be asked which records failed and why, not what your average
     was.
     """
-    raise NotImplementedError("TODO 4: aggregate into a Scoreboard")
+    sb = Scoreboard()
+    sb.total = len(records)
+    
+    for record, doc in zip(records, docs):
+        gold = golds[doc.id]
+        if record is None:
+            # Validation failed - count as invalid
+            sb.invalid += 1
+            sb.failures.append((doc.id, "all_fields", "validation_failed"))
+            continue
+        
+        results = score_one(record, gold, doc.text)
+        
+        for field_name, field_result in results.items():
+            if field_result.correct:
+                sb.hits[field_name] += 1
+            else:
+                sb.failures.append((
+                    doc.id,
+                    field_name,
+                    f"got {field_result.got}, expected {field_result.expected}"
+                ))
+    
+    return sb
 
 
 # --------------------------------------------------------------------------

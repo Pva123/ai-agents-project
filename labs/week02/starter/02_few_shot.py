@@ -61,10 +61,57 @@ def few_shot_block(n: int = 4) -> str:
     stop copying verbatim, and the field that scored perfectly zero-shot
     will get worse. Look at the recording if you want to see that happen.
     """
-    raise NotImplementedError("TODO 5: build the example block")
+
+     # Selected examples (from EXAMPLE_POOL, not DOCS):
+    # EX-01: due_date=None case (teaches null convention)
+    # EX-02: facilities+urgent, French (covers language + facility distinction)
+    # EX-03: hardware with explicit date (shows date format parsing)
+    
+    examples = [
+        {
+            "input": "The badge reader at the side entrance rejects my card since the "
+                     "system update. I can still get in through the main door, so it is "
+                     "not blocking me.",
+            "output": {
+                "category": "access",
+                "urgency": "standard",
+                "due_date": None,
+                "quote": "so it is not blocking me"
+            }
+        },
+        {
+            "input": "L'ascenseur du batiment administratif est bloque entre le rez et le "
+                     "premier avec une personne a l'interieur. Intervention immediate "
+                     "necessaire.",
+            "output": {
+                "category": "facilities",
+                "urgency": "urgent",
+                "due_date": None,
+                "quote": "Intervention immediate necessaire"
+            }
+        },
+        {
+            "input": "Der Laptop aus dem Sitzungssaal laedt nicht mehr, das Netzteil ist "
+                     "vermutlich defekt. Ersatz waere bis zum 20/09/2026 gut.",
+            "output": {
+                "category": "hardware",
+                "urgency": "standard",
+                "due_date": "2026-09-20",
+                "quote": "bis zum 20/09/2026"
+            }
+        }
+    ]
+    
+    block = "Examples:\n\n"
+    for i, ex in enumerate(examples, 1):
+        block += f"Example {i}:\n"
+        block += f"Input: {ex['input']}\n"
+        block += f"Output: {json.dumps(ex['output'], ensure_ascii=False)}\n\n"
+    
+    return block
 
 
-SYSTEM_FEW_SHOT = SYSTEM_ZERO_SHOT + "\n"   # + few_shot_block(), once written
+SYSTEM_FEW_SHOT = SYSTEM_ZERO_SHOT + "\n"  +  few_shot_block()# + few_shot_block(), once written
 
 
 def main() -> int:
@@ -113,6 +160,11 @@ def main() -> int:
     #      cost per thousand calls, and one sentence saying what would change
     #      your mind. "It scored higher" is not sufficient on ten records,
     #      and saying so is worth more marks than claiming a win.
+
+    for label, b in (("zero-shot", zero_board), ("few-shot", few_board)):
+      print(f"\n{label} failures:")
+      for doc_id, fieldname, note in b.failures:
+          print(f"  {doc_id}  {fieldname:<9} {note}")
 
     return 0
 
